@@ -28,10 +28,29 @@ body {
     border: 2px solid #ADCD54;
 }
 
+.reset-button {
+    text-align: center;
+    width: 25%;
+    padding: 20px;
+    border: 2px solid #E7E7E7;
+    background: black;
+    color: #E7E7E7;
+    font-size: 56px;
+    border-radius: 8px;
+    margin: 30px auto auto auto;
+}
+
+.reset-button:hover {
+    color: #ADCD54;
+    border: 2px solid #ADCD54;
+}
+
 .mainBody {
     margin: 50px auto auto auto;
 }
 
-.img-right {
+
+
+.correct-image, .wrong-image {
     height: 240px;
 }

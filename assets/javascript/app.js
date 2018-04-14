@@ -1,5 +1,5 @@
-var gameHTML;
-
+$(document).ready(function () {
+    
 var questionArray = [
     "Which animal can only eat when its head is upside down?",
     "What is the most popular dog breed in Great Britain?",
@@ -11,7 +11,7 @@ var questionArray = [
     "How can you tell a giraffe's age with its spots?"];
 var answerArray = [
     ["Bat", "Flamingo", "Gecko", "Sloth"],
-    ["Corgi", "Labrador Retriever", "French Bulldog", "Poodle"],
+    ["Corgi", "Labrador Retriever", "Great Dane", "Poodle"],
     ["Deer", "Beaver", "Dolphin", "Goat"],
     ["Peahen", "Hen", "Peacock", "Peafowl"],
     ["Rabbits", "Ligers", "Cats", "Mice"],
@@ -19,14 +19,14 @@ var answerArray = [
     ["A pearl", "A feather", "A pebble", "A fish"],
     ["The darker the spots, the older they are.", "The more spots they have, the older they are.", "The lighter the spots the older they are.", "The fewer spots they have, the older they are."]];
 var imageArray = [
-    "<img class='center-block img-right' src='assets/images/flamingo.jpg'>",
-    "<img class='center-block img-right' src='assets/images/lab.jpeg'>",
-    "<img class='center-block img-right' src='assets/images/goat.jpeg'>",
-    "<img class='center-block img-right' src='assets/images/peacock.jpeg'>",
-    "<img class='center-block img-right' src='assets/images/cat.jpeg'>",
-    "<img class='center-block img-right' src='assets/images/tardigrade.jpeg'>",
-    "<img class='center-block img-right' src='assets/images/penguin.jpeg'>",
-    "<img class='center-block img-right' src='assets/images/giraffe.jpeg'>"];
+    "<img class='center-block correct-image' src='assets/images/flamingo.jpg'>",
+    "<img class='center-block correct-image' src='assets/images/lab.jpeg'>",
+    "<img class='center-block correct-image' src='assets/images/goat.jpeg'>",
+    "<img class='center-block correct-image' src='assets/images/peacock.jpeg'>",
+    "<img class='center-block correct-image' src='assets/images/cat.jpeg'>",
+    "<img class='center-block correct-image' src='assets/images/tardigrade.jpeg'>",
+    "<img class='center-block correct-image' src='assets/images/penguin.jpeg'>",
+    "<img class='center-block correct-image' src='assets/images/giraffe.jpeg'>"];
 var correctAnswers = [
     "B. Flamingo",
     "B. Labrador Retriever",
@@ -36,12 +36,13 @@ var correctAnswers = [
     "A. A decade",
     "C. A pebble",
     "A. The darker the spots, the older they are."];
-var selecterAnswer;
-var theClock;
+var clock;
+var incorrectTally = 0;
+var correctTally = 0;
+var unansweredTally = 0;
+var counter = 30;
+var questionCounter = 0;
 
-
-
-$(document).ready(function () {
     //Create a start screen with a start button
 
     function startScreen() {
@@ -50,84 +51,78 @@ $(document).ready(function () {
 
     startScreen();
 
-    //Create a function, generateHTML(), that is triggered by the start button, and generates the HTML seen on the project video...
+    //ON CLICK EVENTS
 
-    $(".start-button").click(function() {
-        incorrectTally = 0;
-        correctTally = 0;
-        unansweredTally = 0;
-        counter = 30;
-        questionCounter = 0;
-        generateHTML();
-        timerWrapper();
+    //once start button clicked, start score at 0 with timer set at 30 secs
+    $("body").on("click", ".start-button", function(event) {
+        generateText();
+        timer();
 
-    });
-  // Closes start-button click
 
+    //check if player's choice matches the correct answer
     $("body").on("click", ".answer", function(event) {
-        //answeredQuestion = true;
-        userSelection = $(this).text();
-        if (userSelection === correctAnswers[questionCounter]) {
-
-            clearInterval(theClock);
-            generateWin();
+        playerChoice = $(this).text();
+        if (playerChoice === correctAnswers[questionCounter]) {
+            clearInterval(clock);
+            rightGuess();
         }
         else {
-            clearInterval(theClock);
-            generateLoss();
+            clearInterval(clock);
+            wrongGuess();
         }
-    }); // Close .answer click
+    }); 
 
+    //reset button
     $("body").on("click", ".reset-button", function(event) {
         resetGame();
-    }); // Closes reset-button click
+    }); 
 
-});  //  Closes jQuery wrapper
+});  
 
-function generateLossDueToTimeOut() {
+function generateText() {
+    showHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>30</span></p><p class='text-center'>" + questionArray[questionCounter] + "</p><p class='text-center answer'>A. " + answerArray[questionCounter][0] + "</p><p class='text-center answer'>B. " + answerArray[questionCounter][1] + "</p><p class='text-center answer'>C. " + answerArray[questionCounter][2] + "</p><p class='text-center answer'>D. " + answerArray[questionCounter][3] + "</p>";
+    $(".mainBody").html(showHTML);
+}
+
+function timeOutLoss() {
+    showHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>" + counter + "</span></p>" + "<p class='text-center'>Shoot, you ran out of time! The answer is: " + correctAnswers[questionCounter] + "</p>" + "<img class='center-block wrong-image' src='assets/images/wronganswer.jpeg'>";
+    $(".mainBody").html(showHTML);
     unansweredTally++;
-    gameHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>" + counter + "</span></p>" + "<p class='text-center'>You ran out of time!  The correct answer was: " + correctAnswers[questionCounter] + "</p>" + "<img class='center-block img-wrong' src='img/x.png'>";
-    $(".mainBody").html(gameHTML);
-    setTimeout(wait, 1000);  
+    setTimeout(wait, 2000);
 }
 
-function generateWin() {
+function rightGuess() {
+    showHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>" + counter + "</span></p>" + "<p class='text-center'>Correct!</p>" + imageArray[questionCounter];
+    $(".mainBody").html(showHTML);
     correctTally++;
-    gameHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>" + counter + "</span></p>" + "<p class='text-center'>Correct! The answer is: " + correctAnswers[questionCounter] + "</p>" + imageArray[questionCounter];
-    $(".mainBody").html(gameHTML);
-    setTimeout(wait, 1000); 
+    setTimeout(wait, 2000);
 }
 
-function generateLoss() {
+function wrongGuess() {
+    showHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>" + counter + "</span></p>" + "<p class='text-center'>Nooope! The answer is: " + correctAnswers[questionCounter] + "</p>" + "<img class='center-block wrong-image' src='assets/images/wronganswer.jpeg'>";
+    $(".mainBody").html(showHTML);
     incorrectTally++;
-    gameHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>" + counter + "</span></p>" + "<p class='text-center'>Wrong! The correct answer is: " + correctAnswers[questionCounter] + "</p>" + "<img class='center-block img-wrong' src='img/x.png'>";
-    $(".mainBody").html(gameHTML);
-    setTimeout(wait, 1000); 
-}
-
-function generateHTML() {
-    gameHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>30</span></p><p class='text-center'>" + questionArray[questionCounter] + "</p><p class='first-answer answer'>A. " + answerArray[questionCounter][0] + "</p><p class='answer'>B. " + answerArray[questionCounter][1] + "</p><p class='answer'>C. " + answerArray[questionCounter][2] + "</p><p class='answer'>D. " + answerArray[questionCounter][3] + "</p>";
-    $(".mainBody").html(gameHTML);
+    setTimeout(wait, 2000);
 }
 
 function wait() {
     if (questionCounter < 7) {
         questionCounter++;
-        generateHTML();
+        generateText();
         counter = 30;
-        timerWrapper();
+        timer();
     }
     else {
-        finalScreen();
+        resultScreen();
     }
 }
 
-function timerWrapper() {
-    theClock = setInterval(thirtySeconds, 1000);
+function timer() {
+    clock = setInterval(thirtySeconds, 2000);
     function thirtySeconds() {
         if (counter === 0) {
-            clearInterval(theClock);
-            generateLossDueToTimeOut();
+            clearInterval(clock);
+            timeOutLoss();
         }
         if (counter > 0) {
             counter--;
@@ -136,9 +131,9 @@ function timerWrapper() {
     }
 }
 
-function finalScreen() {
-    gameHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>" + counter + "</span></p>" + "<p class='text-center'>All done, here's how you did!" + "</p>" + "<p class='summary-correct'>Correct Answers: " + correctTally + "</p>" + "<p>Wrong Answers: " + incorrectTally + "</p>" + "<p>Unanswered: " + unansweredTally + "</p>" + "<p class='text-center reset-button-container'><a class='btn btn-primary btn-lg btn-block reset-button' href='#' role='button'>Reset The Quiz!</a></p>";
-    $(".mainBody").html(gameHTML);
+function resultScreen() {
+    showHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>" + counter + "</span></p>" + "<p class='text-center'>Bravo! Here's how you did." + "</p>" + "<p class='text-center'>Correct Answers: " + correctTally + "</p>" + "<p class='text-center'>Wrong Answers: " + incorrectTally + "</p>" + "<p class='text-center'>Unanswered: " + unansweredTally + "</p>" + "<button class='center-block reset-button'>Play again!!</button>";
+    $(".mainBody").html(showHTML);
 }
 
 function resetGame() {
@@ -147,7 +142,8 @@ function resetGame() {
     incorrectTally = 0;
     unansweredTally = 0;
     counter = 30;
-    generateHTML();
-    timerWrapper();
+    generateText();
+    timer();
 }
+});
 
